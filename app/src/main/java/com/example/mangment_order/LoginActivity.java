@@ -28,7 +28,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         com.google.firebase.FirebaseApp.initializeApp(this);
-        setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
 
         // Find views by their IDs
