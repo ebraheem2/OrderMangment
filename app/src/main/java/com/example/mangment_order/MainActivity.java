@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements OrderAdapter.OnOr
                 }
             });
             // Schedule next update in 1 hour.
-            statusUpdateHandler.postDelayed(this, 6000);
+            statusUpdateHandler.postDelayed(this, 3600000);
         }
     };
 
@@ -277,7 +277,6 @@ public class MainActivity extends AppCompatActivity implements OrderAdapter.OnOr
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         long lastUpdate = prefs.getLong(key, 0);
         final long nowMillis = System.currentTimeMillis();
-
         try {
             final Date now = new Date();
             // Priority 1: Receipt condition.
@@ -301,9 +300,10 @@ public class MainActivity extends AppCompatActivity implements OrderAdapter.OnOr
                 if (departureDate != null && now.after(departureDate)) {
                     // For departure branch: if shipment ordinal < 5, then update.
                     if (shipment.getStatusOfShipment().ordinal() < 5) {
-                        final StatusShipment expectedShipmentStatus = StatusShipment.values()[shipment.getStatusOfShipment().ordinal() + 1];
-                        if (order.getStatusOfOrder().ordinal() < 2) {
-                            final StatusOrders expectedOrderStatus = StatusOrders.values()[order.getStatusOfOrder().ordinal() + 1];
+                        final StatusShipment expectedShipmentStatus = StatusShipment.getStatusMessageByPostion(shipment.getStatusOfShipment().ordinal() + 1);
+                        if (order.getStatusOfOrder().ordinal() < 3) {
+                            final StatusOrders expectedOrderStatus = StatusOrders.getStatusBypos(order.getStatusOfOrder().ordinal()+1);
+
                             runOnUiThread(() -> {
                                 updateStatusInDatabase(shipment, expectedShipmentStatus.toString(),
                                         order, expectedOrderStatus.getStatus());
@@ -320,7 +320,8 @@ public class MainActivity extends AppCompatActivity implements OrderAdapter.OnOr
                 Date receiptDate = (order.getDateOfReceipt() != null) ? sdf.parse(order.getDateOfReceipt()) : null;
                 if (arrivalDate != null && now.after(arrivalDate) && (receiptDate == null || now.before(receiptDate))) {
                     if (shipment.getStatusOfShipment().ordinal() < 8) {
-                        final StatusShipment expectedShipmentStatus = StatusShipment.values()[shipment.getStatusOfShipment().ordinal() + 1];
+
+                        final StatusShipment expectedShipmentStatus = StatusShipment.getStatusMessageByPostion(shipment.getStatusOfShipment().ordinal() + 1);
                         runOnUiThread(() -> {
                             updateStatusInDatabase(shipment, expectedShipmentStatus.toString(),
                                     order, StatusOrders.Arrive_To_Destination.getStatus());
